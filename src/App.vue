@@ -31,6 +31,14 @@ const addTodo = () => {
     done: false,
     createdAt: new Date().getTime(), // using miliseconds do we can order by createdAt
   });
+
+  input_content.value = "";
+  input_category.value = null;
+};
+
+// we check the array for every item. If the item is different than the variable "todo", we put it back into the array
+const removeTodo = (todo) => {
+  todos.value = todos.value.filter((t) => t !== todo);
 };
 
 // if the variable "todos" changes on submit, we will store the newVal in the localstorage
@@ -46,9 +54,11 @@ watch(
 watch(name, (newVal) => {
   localStorage.setItem("name", newVal);
 });
+
 // we bring the value on the localStorage to the input. whenever the screen is refreshed we have it
 onMounted(() => {
   name.value = localStorage.getItem("name") || "";
+  todos.value = JSON.parse(localStorage.getItem("todos")) || [];
 });
 </script>
 
@@ -77,7 +87,7 @@ onMounted(() => {
               type="radio"
               name="category"
               id="category1"
-              value="Business"
+              value="business"
               v-model="input_category"
             />
             <span class="bubble business"></span>
@@ -89,7 +99,7 @@ onMounted(() => {
               type="radio"
               name="category"
               id="category2"
-              value="Personal"
+              value="personal"
               v-model="input_category"
             />
             <span class="bubble personal"></span>
@@ -102,5 +112,31 @@ onMounted(() => {
       </form>
     </section>
     <!-- {{ todos_ascOrder }} -->
+    <section class="todo-list">
+      <h4>Todo List</h4>
+      <div class="list">
+        <!-- v-for = vue for loop / for every todo inside todos_ascOrder -->
+        <!-- create a class that display every item  -->
+        <!-- check if the item is marked true for done. if so we display "done" -->
+        <!-- set the class bubble to business or personal -->
+        <!-- input will display the item and allow to be update -->
+        <!-- the delete button will call function removeTodo to delete the item from localstorage -->
+        <div
+          v-for="todo in todos_ascOrder"
+          :class="`todo-item ${todo.done && 'done'}`"
+        >
+          <label>
+            <input type="checkbox" v-model="todo.done" />
+            <span :class="`bubble ${todo.category}`"></span>
+          </label>
+          <div class="todo-content">
+            <input type="text" v-model="todo.content" />
+          </div>
+          <div class="actions">
+            <button class="delete" @click="removeTodo(todo)">Delete</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </template>
